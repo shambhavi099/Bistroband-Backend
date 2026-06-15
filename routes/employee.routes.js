@@ -6,17 +6,32 @@ const {
   getAllEmployees,
   getEmployeeById,
   updateEmployee,
-  deleteEmployee
+  deleteEmployee,
+  getProfile
 } = require("../controllers/employee.controller");
 
-router.post("/", createEmployee);
+const authMiddleware  = require("../middleware/authMiddleware");
+const roleMiddleware = require("../middleware/roleMiddleware");
 
-router.get("/", getAllEmployees);
+router.post("/", authMiddleware, roleMiddleware("Manager"), createEmployee);
+
+router.get("/", authMiddleware, roleMiddleware("Manager", "Chef"), getAllEmployees);
+
+router.get("/me", authMiddleware,
+  (req, res) => {  
+    res.json({
+      success: true,
+      user: req.user,
+    });
+  }
+);
+
+router.get("/profile", authMiddleware, getProfile );
 
 router.get("/:id", getEmployeeById);
 
 router.put("/:id", updateEmployee);
 
-router.delete("/:id", deleteEmployee)
+router.delete("/:id", authMiddleware, roleMiddleware("Manager", "Chef"), deleteEmployee);
 
 module.exports = router;

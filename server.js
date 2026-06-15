@@ -1,6 +1,6 @@
  const express = require("express");
  require("dotenv").config();
- console.log(process.env.JWT_SECRET);
+
  const app = express();
  const db = require("./config/firebase")
 

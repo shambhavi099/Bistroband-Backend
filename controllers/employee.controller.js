@@ -196,10 +196,45 @@ const deleteEmployee = async (req, res) => {
   }
 };
 
+const getProfile = async (req, res) => {
+  try {
+    const employeeDoc = await db
+      .collection("employees")
+      .doc(req.user.id)
+      .get();
+
+    if (!employeeDoc.exists) {
+      return res.status(404).json({
+        success: false,
+        message: "Employee not found",
+      });
+    }
+
+    const employee = employeeDoc.data();
+
+    delete employee.password;
+
+    res.status(200).json({
+      success: true,
+      data: {
+        id: employeeDoc.id,
+        ...employee,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
 module.exports = {
   createEmployee,
   getAllEmployees,
   getEmployeeById,
   updateEmployee,
   deleteEmployee,
+  getProfile
 };
