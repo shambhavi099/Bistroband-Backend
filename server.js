@@ -1,11 +1,22 @@
  const express = require("express");
  require("dotenv").config();
+ const cors = require("cors");
 
  const app = express();
  const db = require("./config/firebase")
 
 const employeeRoutes = require("./routes/employee.routes")
 const authRoutes = require("./routes/authRoutes")
+const orders = require("./routes/ordersRoutes")
+const tableRoutes = require("./routes/tableRoutes");
+const dashboardRoutes = require("./routes/dashboardroutes");
+
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  })
+);
 
  app.use(express.json());
 
@@ -13,20 +24,11 @@ const authRoutes = require("./routes/authRoutes")
    res.send("Yes")
  })
 
- app.get("/test", async(req, res)=>{
-   try{  
-      await db.collection("test").add({
-         message:"testing",
-         createdAt:new Date(),
-      })
-      res.send("Hi")
-   }catch(error){
-      console.log(error.message)
-   }
- })
-
  app.use("/api/employees", employeeRoutes)
  app.use("/api/auth", authRoutes)
+ app.use("/api/orders", orders)
+ app.use("/api/tables", tableRoutes);
+ app.use("/api/dashboard", dashboardRoutes);
 
  app.listen(5000, ()=>{
     console.log("server started")
