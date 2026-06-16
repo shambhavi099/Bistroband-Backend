@@ -9,7 +9,8 @@ const employeeRoutes = require("./routes/employee.routes")
 const authRoutes = require("./routes/authRoutes")
 const orders = require("./routes/ordersRoutes")
 const tableRoutes = require("./routes/tableRoutes");
-const dashboardRoutes = require("./routes/dashboardroutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
+const menuRoutes = require("./routes/menuRoutes");
 
 app.use(
   cors({
@@ -29,6 +30,7 @@ app.use(
  app.use("/api/orders", orders)
  app.use("/api/tables", tableRoutes);
  app.use("/api/dashboard", dashboardRoutes);
+ app.use("/api/menu", menuRoutes)
 
  app.listen(5000, ()=>{
     console.log("server started")
