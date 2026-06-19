@@ -5,7 +5,6 @@ const createEmployee = async (req, res) => {
   try {
     const {
       name,
-      age,
       email,
       password,
       role,
@@ -13,13 +12,13 @@ const createEmployee = async (req, res) => {
       phone,
       address,
       aadhaar,
+      
     } = req.body;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const employeeData = {
       name,
-      age,
       email,
       password: hashedPassword,
       role,
@@ -27,6 +26,7 @@ const createEmployee = async (req, res) => {
       phone,
       address,
       aadhaar,
+      status: "on-duty",
       createdAt: new Date(),
     };
 
@@ -37,6 +37,7 @@ const createEmployee = async (req, res) => {
     res.status(201).json({
       success: true,
       employeeId: docRef.id,
+      data: employeeData,
       message: "Employee created successfully",
     });
   } catch (error) {
@@ -45,7 +46,6 @@ const createEmployee = async (req, res) => {
     res.status(500).json({
       success: false,
       message: error.message,
-      data: employeeData
     });
   }
 };
@@ -120,7 +120,9 @@ const getEmployeeById = async (req, res) => {
 const updateEmployee = async (req, res) => {
   try {
     const { id } = req.params;
-
+    if (!updateData.status) {
+      delete updateData.status;
+    }
     const employeeRef = db
       .collection("employees")
       .doc(id);
@@ -229,6 +231,53 @@ const getProfile = async (req, res) => {
   }
 };
 
+const updateEmployeeStatus = async (req, res) => {
+  try {
+
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const employeeRef = db
+      .collection("employees")
+      .doc(id);
+
+    const employeeDoc = await employeeRef.get();
+
+    if (!employeeDoc.exists) {
+      return res.status(404).json({
+        success: false,
+        message: "Employee not found",
+      });
+    }
+
+    await employeeRef.update({
+      status,
+    });
+
+    const updated = await employeeRef.get();
+
+    const employee = updated.data();
+
+    delete employee.password;
+
+    res.status(200).json({
+      success: true,
+      data: {
+        id: updated.id,
+        ...employee,
+      },
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+
+  }
+};
+
 
 module.exports = {
   createEmployee,
@@ -236,5 +285,6 @@ module.exports = {
   getEmployeeById,
   updateEmployee,
   deleteEmployee,
-  getProfile
+  getProfile,
+  updateEmployeeStatus,
 };

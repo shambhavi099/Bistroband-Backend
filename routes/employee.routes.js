@@ -7,7 +7,8 @@ const {
   getEmployeeById,
   updateEmployee,
   deleteEmployee,
-  getProfile
+  getProfile,
+  updateEmployeeStatus
 } = require("../controllers/employee.controller");
 
 const authMiddleware  = require("../middleware/authMiddleware");
@@ -33,5 +34,12 @@ router.get("/:id", getEmployeeById);
 router.put("/:id", updateEmployee);
 
 router.delete("/:id", authMiddleware, roleMiddleware("Manager", "Chef"), deleteEmployee);
+
+router.patch(
+  "/status/:id",
+  authMiddleware,
+  roleMiddleware(["Manager"]),
+  updateEmployeeStatus
+);
 
 module.exports = router;

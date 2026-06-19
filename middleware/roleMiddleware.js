@@ -1,5 +1,9 @@
-const roleMiddleware = (...allowedRoles) => {
+module.exports = (allowedRoles) => {
   return (req, res, next) => {
+
+    console.log("Allowed Roles:", allowedRoles);
+    console.log("User Role:", req.user.role);
+
     if (!allowedRoles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
@@ -10,5 +14,3 @@ const roleMiddleware = (...allowedRoles) => {
     next();
   };
 };
-
-module.exports = roleMiddleware;
