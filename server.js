@@ -13,7 +13,9 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 const menuRoutes = require("./routes/menuRoutes");
 const inventoryRoutes = require("./routes/inventoryRoutes");
 const customerRoutes = require("./routes/customerRoutes");
-
+const paymentRoutes = require("./routes/paymentRoutes");
+const reportRoutes = require("./routes/reportsRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
@@ -35,6 +37,9 @@ app.use(
  app.use("/api/menu", menuRoutes);
  app.use("/api/inventory", inventoryRoutes);
  app.use("/api/customers", customerRoutes);
+ app.use("/api/payments", paymentRoutes);
+ app.use("/api/reports", reportRoutes);
+ app.use("/api/admin", adminRoutes);
 
  app.listen(5000, ()=>{
     console.log("server started")
