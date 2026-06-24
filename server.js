@@ -16,6 +16,7 @@ const customerRoutes = require("./routes/customerRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const reportRoutes = require("./routes/reportsRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const customerAuthRoutes = require("./routes/customerAuthRoutes");
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
@@ -40,6 +41,7 @@ app.use(
  app.use("/api/payments", paymentRoutes);
  app.use("/api/reports", reportRoutes);
  app.use("/api/admin", adminRoutes);
+ app.use("/api/customers", customerAuthRoutes);
 
  app.listen(5000, ()=>{
     console.log("server started")

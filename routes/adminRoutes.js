@@ -11,7 +11,8 @@ const {
   getAuditLogs,
   createAuditLog,
   deleteAuditLog,
-  clearAuditLogs
+  clearAuditLogs,
+  factoryReset
 } = require("../controllers/adminController");
 
 router.get("/config", getSystemConfig);
@@ -22,9 +23,11 @@ router.post("/promos", createPromoCampaign);
 router.patch("/promos/:id", togglePromoCampaignStatus);
 router.delete("/promos/:id", deletePromoCampaign );
 
-router.get("/audit-logs", getAuditLogs);
-router.post("/audit-logs", createAuditLog);
-router.delete("/audit-logs/:id", deleteAuditLog);
-router.delete("/audit-logs", clearAuditLogs)
+router.get("/audit", getAuditLogs);
+router.post("/audit", createAuditLog);
+router.delete("/audit/:id", deleteAuditLog);
+router.delete("/audit", clearAuditLogs)
+
+router.delete("/factory-reset", factoryReset);
 
 module.exports = router;

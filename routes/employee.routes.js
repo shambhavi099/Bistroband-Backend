@@ -14,9 +14,13 @@ const {
 const authMiddleware  = require("../middleware/authMiddleware");
 const roleMiddleware = require("../middleware/roleMiddleware");
 
-router.post("/", authMiddleware, roleMiddleware("Manager"), createEmployee);
-
-router.get("/", authMiddleware, roleMiddleware("Manager", "Chef"), getAllEmployees);
+router.post("/", authMiddleware, roleMiddleware(["Manager"]), createEmployee);
+router.get(
+    "/",
+    authMiddleware,
+    roleMiddleware(["Manager", "Chef"]),
+    getAllEmployees
+);
 
 router.get("/me", authMiddleware,
   (req, res) => {  
@@ -33,7 +37,12 @@ router.get("/:id", getEmployeeById);
 
 router.put("/:id", updateEmployee);
 
-router.delete("/:id", authMiddleware, roleMiddleware("Manager", "Chef"), deleteEmployee);
+router.delete(
+    "/:id",
+    authMiddleware,
+    roleMiddleware(["Manager", "Chef"]),
+    deleteEmployee
+);
 
 router.patch(
   "/status/:id",

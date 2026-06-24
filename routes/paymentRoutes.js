@@ -7,6 +7,7 @@ const {
   getPaymentById,
   createPayment,
   deletePayment,
+  clearPayments
 } = require("../controllers/paymentController");
 
 // Get all payments
@@ -20,5 +21,8 @@ router.post("/", createPayment);
 
 // Delete payment
 router.delete("/:id", deletePayment);
+
+//Clear All Data
+router.delete("/", clearPayments);
 
 module.exports = router;

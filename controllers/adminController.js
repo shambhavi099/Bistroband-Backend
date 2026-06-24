@@ -212,7 +212,6 @@ const togglePromoCampaignStatus = async (req, res) => {
 const deletePromoCampaign = async (req, res) => {
   try {
     const { id } = req.params;
-
     const promoRef = db
       .collection("promoCampaigns")
       .doc(id);
@@ -391,6 +390,58 @@ const clearAuditLogs = async (req, res) => {
   }
 };
 
+const factoryReset = async (req, res) => {
+  try {
+    const collectionsToClear = [
+      "orders",
+      "payments",
+      "customers",
+      "promoCampaigns",
+      "auditLogs",
+    ];
+
+    for (const collection of collectionsToClear) {
+      const snapshot = await db.collection(collection).get();
+
+      const batch = db.batch();
+
+      snapshot.forEach((doc) => {
+        batch.delete(doc.ref);
+      });
+
+      await batch.commit();
+    }
+
+    // Reset all tables
+    const tableSnapshot = await db.collection("tables").get();
+
+    const tableBatch = db.batch();
+
+    tableSnapshot.forEach((doc) => {
+      tableBatch.update(doc.ref, {
+        status: "available",
+        occupiedBy: null,
+        currentOrderId: null,
+      });
+    });
+
+    await tableBatch.commit();
+
+    return res.status(200).json({
+      success: true,
+      message: "Restaurant restored to factory defaults.",
+    });
+
+  } catch (error) {
+    console.error("Factory Reset Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   getSystemConfig,
   updateSystemConfig,
@@ -403,6 +454,8 @@ module.exports = {
   getAuditLogs,
   createAuditLog,
   deleteAuditLog,
-  clearAuditLogs
+  clearAuditLogs,
+
+  factoryReset
   
 };

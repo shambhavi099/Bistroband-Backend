@@ -216,9 +216,36 @@ const deletePayment = async (req, res) => {
   }
 };
 
+const clearPayments = async (req, res) => {
+  try {
+    const snapshot = await db.collection("payments").get();
+
+    const batch = db.batch();
+
+    snapshot.forEach((doc) => {
+      batch.delete(doc.ref);
+    });
+
+    await batch.commit();
+
+    return res.status(200).json({
+      success: true,
+      message: "Financial ledgers cleared successfully",
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   getPayments,
   getPaymentById,
   createPayment,
   deletePayment,
+  clearPayments
 };

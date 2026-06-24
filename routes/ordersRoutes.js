@@ -16,14 +16,14 @@ const roleMiddleware = require("../middleware/roleMiddleware");
 router.post(
   "/",
   authMiddleware,
-  roleMiddleware("Manager", "Server"),
+  roleMiddleware(["Manager", "Server"]),
   createOrder
 );
 
 router.get(
   "/",
   authMiddleware,
-  roleMiddleware("Manager", "Chef", "Server"),
+  roleMiddleware(["Manager", "Chef", "Server"]),
   getAllOrders
 );
 
@@ -37,7 +37,7 @@ router.patch(
 router.patch(
   "/:id/status",
   authMiddleware,
-  roleMiddleware("Manager", "Chef"),
+  roleMiddleware(["Manager", "Chef"]),
   updateOrderStatus
 );
 

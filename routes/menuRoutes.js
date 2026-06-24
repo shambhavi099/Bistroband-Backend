@@ -17,7 +17,7 @@ const roleMiddleware = require("../middleware/roleMiddleware");
 router.post(
   "/",
   authMiddleware,
-  roleMiddleware("Manager"),
+  roleMiddleware(["Manager"]),
   createMenuItem
 );
 
@@ -38,7 +38,7 @@ router.get(
 router.put(
   "/:id",
   authMiddleware,
-  roleMiddleware("Manager"),
+  roleMiddleware(["Manager"]),
   updateMenuItem
 );
 
@@ -46,7 +46,7 @@ router.put(
 router.patch(
   "/:id/availability",
   authMiddleware,
-  roleMiddleware("Manager", "Chef"),
+  roleMiddleware(["Manager", "Chef"]),
   updateAvailability
 );
 
@@ -54,7 +54,7 @@ router.patch(
 router.delete(
   "/:id",
   authMiddleware,
-  roleMiddleware("Manager"),
+  roleMiddleware(["Manager"]),
   deleteMenuItem
 );
 

@@ -3,7 +3,6 @@ const jwt = require("jsonwebtoken");
 const authMiddleware = (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
-
     if (!authHeader) {
       return res.status(401).json({
         success: false,
@@ -22,6 +21,8 @@ const authMiddleware = (req, res, next) => {
 
     next();
   } catch (error) {
+    console.log(error.name);
+    console.log(error.message);  
     return res.status(401).json({
       success: false,
       message: "Invalid token",
