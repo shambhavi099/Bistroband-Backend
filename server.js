@@ -17,15 +17,8 @@ const paymentRoutes = require("./routes/paymentRoutes");
 const reportRoutes = require("./routes/reportsRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const customerAuthRoutes = require("./routes/customerAuthRoutes");
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5173",
-      "https://bistroband-frontend-aj5u-shambhavi099s-projects.vercel.app"
-    ],
-    credentials: true,
-  })
-);
+app.use(cors());
+
 
  app.use(express.json());
 
