@@ -19,7 +19,10 @@ const adminRoutes = require("./routes/adminRoutes");
 const customerAuthRoutes = require("./routes/customerAuthRoutes");
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: [
+      "http://localhost:5173",
+      "https://bistroband-frontend-aj5u-shambhavi099s-projects.vercel.app"
+    ],
     credentials: true,
   })
 );
