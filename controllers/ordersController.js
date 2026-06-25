@@ -3,47 +3,53 @@ const db = require("../config/firebase");
 const createOrder = async (req, res) => {
   try {
     const {
-      orderNumber,
-      customerName,
-      tableId,
-      tableNumber,
-      items,
-      totalAmount,
-      specialInstructions,
+        orderNumber,
+        customerId,
+        customerName,
+        tableId,
+        tableNumber,
+        items,
+        totalAmount,
+        specialInstructions,
     } = req.body;
 
-    const orderData = {
-      orderNumber,
-      customerName,
-      tableId,
-      tableNumber,
-      items,
-      totalAmount,
-      specialInstructions: specialInstructions || "",
-      status: "PREPARING",
-      createdAt: new Date(),
-    };
+      const orderData = {
+        orderNumber,
+        customerId: customerId || null,
+        customerName,
+        items,
+        totalAmount,
+        specialInstructions: specialInstructions || "",
+        status: "PREPARING",
+        createdAt: new Date(),
+      };
 
-    const docRef = await db
-      .collection("orders")
-      .add(orderData);
+      if (tableId) {
+        orderData.tableId = tableId;
+        orderData.tableNumber = tableNumber;
+      }
 
-    const tableRef = db.collection("tables").doc(tableId);
+    const docRef = await db.collection("orders").add(orderData);
 
-    const tableDoc = await tableRef.get();
+    if (tableId) {
+      const tableRef = db.collection("tables").doc(tableId);
 
-    if (!tableDoc.exists) {
-      return res.status(404).json({
-        success: false,
-        message: "Table not found",
+      const tableDoc = await tableRef.get();
+
+      if (!tableDoc.exists) {
+        return res.status(404).json({
+          success: false,
+          message: "Table not found",
+        });
+      }
+
+      await tableRef.update({
+        status: "OCCUPIED",
+        currentOrderId: docRef.id,
+        updatedAt: new Date(),
       });
     }
 
-    await tableRef.update({
-      status: "OCCUPIED",
-      currentOrderId: docRef.id,
-      updatedAt: new Date(),
-    });  
 
     res.status(201).json({
       success: true,

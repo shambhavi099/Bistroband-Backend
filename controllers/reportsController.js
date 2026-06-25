@@ -123,7 +123,66 @@ const getPopularItems = async (req, res) => {
   }
 };
 
+const getRevenueTrend = async (req, res) => {
+  try {
+    const snapshot = await db.collection("orders").get();
+
+    // Last 7 days initialized with 0 revenue
+    const revenueMap = {};
+
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setHours(0, 0, 0, 0);
+      date.setDate(date.getDate() - i);
+
+      const key = date.toISOString().split("T")[0];
+
+      revenueMap[key] = {
+        day: date.toLocaleDateString("en-IN", {
+          weekday: "short",
+        }),
+        revenue: 0,
+        orders: 0,
+      };
+    }
+
+    snapshot.forEach((doc) => {
+      const order = doc.data();
+
+      if (!order.createdAt) return;
+      if (order.status === "CANCELLED") return;
+
+      const orderDate = order.createdAt.toDate();
+
+      orderDate.setHours(0, 0, 0, 0);
+
+      const key = orderDate.toISOString().split("T")[0];
+
+      if (revenueMap[key]) {
+        revenueMap[key].revenue += Number(order.totalAmount || 0);
+        revenueMap[key].orders += 1;
+      }
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: Object.values(revenueMap),
+    });
+
+  } catch (error) {
+
+    console.error("Revenue Trend Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+
+  }
+};
+
 module.exports = {
   getReportSummary,
   getPopularItems,
+  getRevenueTrend
 };

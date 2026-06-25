@@ -61,8 +61,6 @@ const createPayment = async (req, res) => {
     const {
       orderId,
       tableNumber,
-      customerId,
-      customerName,
       subtotal,
       tip,
       discount,
@@ -76,6 +74,17 @@ const createPayment = async (req, res) => {
       });
     }
 
+    let customerId = null;
+
+    // Fetch customerId from Order
+    if (orderId) {
+      const orderSnap = await db.collection("orders").doc(orderId).get();
+
+      if (orderSnap.exists) {
+        customerId = orderSnap.data().customerId || null;
+      }
+    }
+
     // Transaction ID
     const paymentId =
       "TXN-" + Math.floor(100000 + Math.random() * 900000);
@@ -86,9 +95,6 @@ const createPayment = async (req, res) => {
       orderId: orderId || null,
       tableNumber: tableNumber || null,
 
-      customerId: customerId || null,
-      customerName: customerName || "Walk-In Guest",
-
       subtotal: Number(subtotal),
       tip: Number(tip),
       discount: Number(discount),
@@ -98,36 +104,22 @@ const createPayment = async (req, res) => {
       status: "Settled",
 
       timestamp: new Date().toLocaleString(),
-
-      createdAt: new Date()
+      createdAt: new Date(),
     };
 
     // Save Payment
-    const paymentRef = await db
-      .collection("payments")
-      .add(paymentData);
+    const paymentRef = await db.collection("payments").add(paymentData);
 
-    // -----------------------------
     // UPDATE ORDER
-    // -----------------------------
     if (orderId) {
-      const orderRef = db.collection("orders").doc(orderId);
-
-      const orderSnap = await orderRef.get();
-
-      if (orderSnap.exists) {
-        await orderRef.update({
-          status: "COMPLETED",
-          paymentStatus: "Paid",
-          updatedAt:
-            new Date()
-        });
-      }
+      await db.collection("orders").doc(orderId).update({
+        status: "COMPLETED",
+        paymentStatus: "Paid",
+        updatedAt: new Date(),
+      });
     }
 
-    // -----------------------------
     // UPDATE TABLE
-    // -----------------------------
     if (tableNumber) {
       const tableSnapshot = await db
         .collection("tables")
@@ -136,43 +128,29 @@ const createPayment = async (req, res) => {
         .get();
 
       if (!tableSnapshot.empty) {
-        const tableDoc = tableSnapshot.docs[0];
-
-        await tableDoc.ref.update({
+        await tableSnapshot.docs[0].ref.update({
           status: "available",
           spendAmount: 0,
           assignedStaffName: "",
           currentOrderId: "",
-          updatedAt:
-            new Date()
+          updatedAt: new Date(),
         });
       }
     }
 
-    // -----------------------------
     // UPDATE CUSTOMER
-    // -----------------------------
     if (customerId) {
-      const customerRef = db
-        .collection("customers")
-        .doc(customerId);
-
+      const customerRef = db.collection("customers").doc(customerId);
       const customerSnap = await customerRef.get();
 
       if (customerSnap.exists) {
         const customer = customerSnap.data();
 
         await customerRef.update({
-          totalSpent:
-            Number(customer.totalSpent || 0) + Number(total),
-
-          totalVisits:
-            Number(customer.totalVisits || 0) + 1,
-
+          totalSpent: Number(customer.totalSpent || 0) + Number(total),
+          totalVisits: Number(customer.totalVisits || 0) + 1,
           lastVisit: new Date().toLocaleDateString(),
-
-          updatedAt:
-            new Date()
+          updatedAt: new Date(),
         });
       }
     }

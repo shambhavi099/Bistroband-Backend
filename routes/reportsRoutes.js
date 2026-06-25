@@ -5,6 +5,7 @@ const router = express.Router();
 const {
   getReportSummary,
   getPopularItems,
+  getRevenueTrend
 } = require("../controllers/reportsController");
 
 const authMiddleware = require("../middleware/authMiddleware");
@@ -15,6 +16,13 @@ router.get(
   authMiddleware,
   roleMiddleware(["Manager"]),
   getReportSummary
+);
+
+router.get(
+  "/revenue-trend",
+  authMiddleware,
+  roleMiddleware("Manager"),
+  getRevenueTrend
 );
 
 router.get(
