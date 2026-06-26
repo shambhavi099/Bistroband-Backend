@@ -24,7 +24,6 @@ router.post(
 // Everyone logged in
 router.get(
   "/",
-  authMiddleware,
   getAllMenuItems
 );
 
